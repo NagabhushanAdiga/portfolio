@@ -1,0 +1,138 @@
+.skill-logos {
+  padding: 80px 0;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+.skill-logos::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 15% 40%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 60%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+}
+
+.skill-logos-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.logos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.logo-card {
+  background: var(--bg-tertiary);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--border-color);
+  border-radius: 15px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--hover-color);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.logo-card:hover::before {
+  opacity: 0.1;
+}
+
+.logo-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  border-color: var(--hover-color);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.tech-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-card:hover .tech-logo {
+  transform: scale(1.2) rotateY(360deg);
+}
+
+.tech-name {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-card:hover .tech-name {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .logos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .logo-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .tech-logo {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+  }
+
+  .logo-card {
+    padding: 1.2rem 0.8rem;
+  }
+
+  .tech-logo {
+    width: 45px;
+    height: 45px;
+  }
+
+  .tech-name {
+    font-size: 0.85rem;
+  }
+}
+
