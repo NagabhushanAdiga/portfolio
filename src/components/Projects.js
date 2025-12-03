@@ -21,6 +21,22 @@ const Projects = () => {
       demo: 'https://shopeui.vercel.app/'
     },
     {
+      title: 'Search with OpenAI - AI Chat Application',
+      description: 'An intelligent search and chat application powered by OpenAI API. Users can interact with AI to get answers, search information, and have natural conversations. Built with React and integrated with OpenAI\'s API for advanced AI capabilities.',
+      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop&q=80',
+      tech: ['React', 'OpenAI API', 'JavaScript', 'CSS3', 'Vercel'],
+      features: [
+        'AI-powered search and chat interface',
+        'Integration with OpenAI API',
+        'Natural language conversations',
+        'Real-time AI responses',
+        'Modern and intuitive UI design',
+        'Responsive design for all devices'
+      ],
+      github: '#',
+      demo: 'https://searchwith-open-ai.vercel.app/'
+    },
+    {
       title: 'Chatbot - AI Suggestion App',
       description: 'An interactive chatbot application built with React and JavaScript that provides intelligent suggestions and conversational interface. A frontend-only solution that delivers a seamless chat experience with modern UI/UX design.',
       image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600&h=400&fit=crop&q=80',
