@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import './Contact.css';
 
@@ -13,12 +13,18 @@ const Contact = () => {
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize EmailJS with your credentials
-  // Replace these with your actual EmailJS credentials or use environment variables
-  // For security, use environment variables (REACT_APP_EMAILJS_PUBLIC_KEY, etc.)
-  const PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
-  const SERVICE_ID = process.env.REACT_APP_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
-  const TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
+  // EmailJS configuration
+  const PUBLIC_KEY = 'EVkZIaRS0ZnvmDSTQ';
+  const SERVICE_ID = 'service_voj5soq';
+  const AUTO_REPLY_TEMPLATE_ID = 'template_yk7ajp6'; // Auto-Reply template (to form submitter)
+  const NOTIFICATION_TEMPLATE_ID = 'template_qxurx2a'; // Contact Us template (notification to you)
+
+  // Initialize EmailJS when component mounts
+  useEffect(() => {
+    if (PUBLIC_KEY) {
+      emailjs.init(PUBLIC_KEY);
+    }
+  }, [PUBLIC_KEY]);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,44 +33,103 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setStatus({ type: '', message: '' });
 
-    // Prepare template parameters
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      subject: formData.subject,
-      message: formData.message,
-      to_email: 'nagbhushan.adiga@gmail.com' // Your email address
+    // Validate EmailJS configuration
+    if (!PUBLIC_KEY) {
+      setStatus({
+        type: 'error',
+        message: 'Email service is not configured.'
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setStatus({
+        type: 'error',
+        message: 'Please enter a valid email address.'
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Clean email addresses (remove any whitespace)
+    const submitterEmail = formData.email.trim();
+    const ownerEmail = 'nagbhushan.adiga@gmail.com';
+
+    // Prepare template parameters for auto-reply (to form submitter)
+    // Template uses {{name}} and {{title}} - matching those parameters
+    const autoReplyParams = {
+      to_email: submitterEmail, // Recipient: the person who submitted the form
+      to_name: formData.name.trim(),
+      name: formData.name.trim(), // Template uses {{name}}
+      title: formData.subject.trim(), // Template uses {{title}}
+      subject: `Re: ${formData.subject.trim()}`,
+      from_name: formData.name.trim(),
+      from_email: submitterEmail,
+      user_name: formData.name.trim(),
+      user_email: submitterEmail,
+      email: submitterEmail,
+      message: formData.message.trim(),
+      reply_to: ownerEmail
     };
 
-    // Send email using EmailJS
-    emailjs
-      .send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
-      .then(
-        (response) => {
-          console.log('SUCCESS!', response.status, response.text);
-          setStatus({
-            type: 'success',
-            message: 'Message sent successfully! 🎉 I\'ll get back to you soon.'
-          });
-          setFormData({ name: '', email: '', subject: '', message: '' });
-          setIsLoading(false);
-          setTimeout(() => setStatus({ type: '', message: '' }), 5000);
-        },
-        (error) => {
-          console.error('FAILED...', error);
-          setStatus({
-            type: 'error',
-            message: 'Failed to send message. Please try again or email me directly.'
-          });
-          setIsLoading(false);
-          setTimeout(() => setStatus({ type: '', message: '' }), 5000);
-        }
-      );
+    // Prepare template parameters for notification (to nagbhushan.adiga@gmail.com with form details)
+    const notificationParams = {
+      to_email: ownerEmail, // Your email - recipient of notification
+      to_name: 'Nagabhushan',
+      // Form submitter details
+      from_name: formData.name.trim(),
+      from_email: submitterEmail,
+      user_name: formData.name.trim(),
+      user_email: submitterEmail,
+      name: formData.name.trim(),
+      email: submitterEmail,
+      // Form details
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+      form_subject: formData.subject.trim(),
+      form_message: formData.message.trim(),
+      // Email subject
+      email_subject: `New Contact Form Submission: ${formData.subject.trim()}`,
+      // Reply information
+      reply_to: submitterEmail,
+      reply_to_email: submitterEmail,
+      reply_to_name: formData.name.trim()
+    };
+
+    try {
+      // Send both emails: auto-reply to submitter and notification to you
+      const [autoReplyResponse, notificationResponse] = await Promise.all([
+        emailjs.send(SERVICE_ID, AUTO_REPLY_TEMPLATE_ID, autoReplyParams, PUBLIC_KEY),
+        emailjs.send(SERVICE_ID, NOTIFICATION_TEMPLATE_ID, notificationParams, PUBLIC_KEY)
+      ]);
+
+      console.log('Auto-reply sent!', autoReplyResponse.status, autoReplyResponse.text);
+      console.log('Notification sent!', notificationResponse.status, notificationResponse.text);
+
+      setStatus({
+        type: 'success',
+        message: 'Message sent successfully! 🎉'
+      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setIsLoading(false);
+      setTimeout(() => setStatus({ type: '', message: '' }), 5000);
+    } catch (error) {
+      console.error('FAILED...', error);
+      setStatus({
+        type: 'error',
+        message: error.text || 'Failed to send message. Please try again or email me directly.'
+      });
+      setIsLoading(false);
+      setTimeout(() => setStatus({ type: '', message: '' }), 5000);
+    }
   };
 
   return (
@@ -169,8 +234,8 @@ const Contact = () => {
                 required
               ></textarea>
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-btn"
               disabled={isLoading}
             >
